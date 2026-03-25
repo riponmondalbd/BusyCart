@@ -6,21 +6,19 @@ export interface JwtPayload {
   role: string;
 }
 
-export interface AuthRequest extends Request {
-  user?: JwtPayload;
-}
-
 export const protect = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  //   invalid token
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
   try {
-    const decode = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    req.user = decode;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+
+    req.user = decoded;
+
     next();
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" });
