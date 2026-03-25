@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/prisma";
 
+// super admin only
 // get all admins list - super admin only
 export const getAllAdmins = async (req: any, res: any) => {
   try {
