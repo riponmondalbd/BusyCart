@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteProfilePhoto,
   getProfile,
   updatePassword,
   updateProfilePhoto,
@@ -14,5 +15,6 @@ router.get("/profile", protect, getProfile);
 router.put("/profile", protect, updateUserProfile);
 router.put("/password", protect, updatePassword);
 router.put("/photo", protect, upload.single("image"), updateProfilePhoto);
+router.delete("/photo", protect, deleteProfilePhoto);
 
 export default router;

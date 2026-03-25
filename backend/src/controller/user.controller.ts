@@ -141,3 +141,38 @@ export const updateProfilePhoto = async (req: any, res: any) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+// delete profile photo
+export const deleteProfilePhoto = async (req: any, res: any) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+    });
+
+    // if profile have no photo
+    if (!user?.imagePublicId) {
+      return res.status(400).json({ message: "No profile photo to delete" });
+    }
+
+    // delete photo from cloudinary
+    await cloudinary.uploader.destroy(user.imagePublicId);
+
+    // remove from database
+    const updateUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        imageUrl: null,
+        imagePublicId: null,
+      },
+    });
+
+    res.json({
+      message: "Profile photo deleted successfully",
+      user: updateUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
