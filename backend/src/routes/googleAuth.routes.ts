@@ -22,7 +22,7 @@ router.get(
         id: user.id,
         role: user.role,
       },
-      process.env.JWT_SECRET!,
+      process.env.ACCESS_TOKEN_SECRET!,
       { expiresIn: "1h" },
     );
 

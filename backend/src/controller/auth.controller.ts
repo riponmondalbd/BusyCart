@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { prisma } from "../prisma/prisma";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateTokens";
 
 // register user
 export const registerUser = async (req: Request, res: Response) => {
@@ -50,14 +53,28 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // generate JWT token
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1h" },
-    );
+    //  generate tokens
+    const accessToken = generateAccessToken(user.id, user.role);
+    const refreshToken = generateRefreshToken(user.id);
 
-    res.json({ message: "Login successful", token });
+    // store refresh token to DB
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
+
+    //  Send refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ message: "Login successful", token: accessToken });
   } catch (error) {
     res.status(500).json({ message: "Error logging in user" });
   }
