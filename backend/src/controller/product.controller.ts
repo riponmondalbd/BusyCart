@@ -217,3 +217,53 @@ export const updateProduct = async (req: Request, res: Response) => {
     });
   }
 };
+
+// delete product - admin and super admin only
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "Product id is required",
+      });
+    }
+    // find product
+    const product = await prisma.product.findUnique({
+      where: { id: id as string },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    // Delete images from Cloudinary
+    for (const url of product.images) {
+      const parts = url.split("/");
+      const publicIdWithExtension = parts.slice(-1)[0];
+      const publicId = `busycart_products/${publicIdWithExtension.split(".")[0]}`;
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error("Failed to delete Cloudinary image:", err);
+      }
+    }
+
+    // Delete product from database
+    await prisma.product.delete({
+      where: { id: id as string },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Failed to delete product",
+      error: error.message,
+    });
+  }
+};

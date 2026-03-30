@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createProduct,
+  deleteProduct,
   getAllProducts,
   getProductById,
   updateProduct,
@@ -26,6 +27,12 @@ router.put(
   authorize("ADMIN", "SUPER_ADMIN"),
   upload.array("images", 5),
   updateProduct,
+);
+router.delete(
+  "/products/:id",
+  protect,
+  authorize("ADMIN", "SUPER_ADMIN"),
+  deleteProduct,
 );
 
 export default router;
