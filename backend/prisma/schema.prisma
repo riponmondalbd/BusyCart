@@ -30,6 +30,7 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   wishlists Wishlist[]
+  cart      Cart?
 }
 
 model RefreshToken {
@@ -79,6 +80,7 @@ model Product {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   wishlists Wishlist[]
+  cartItems CartItem[]
 }
 
 model Wishlist {
@@ -92,4 +94,28 @@ model Wishlist {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, productId])
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }

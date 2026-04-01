@@ -1,6 +1,7 @@
 import { Router } from "express";
 import adminRoutes from "./admin.routes";
 import authRoutes from "./auth.routes";
+import cartRoutes from "./cart.routes";
 import categoryRoutes from "./category.routes";
 import googleAuthRoutes from "./googleAuth.routes";
 import productRoutes from "./product.routes";
@@ -20,5 +21,6 @@ router.use("/refresh", refreshTokenRoutes);
 router.use("/product", productRoutes);
 router.use("/category", categoryRoutes);
 router.use("/wishlist", wishlistRoutes);
+router.use("/cart", cartRoutes);
 
 export default router;
