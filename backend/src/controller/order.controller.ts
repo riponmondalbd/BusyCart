@@ -1,0 +1,99 @@
+import { prisma } from "../prisma/prisma";
+
+// create order
+export const createOrder = async (req: any, res: any) => {
+  try {
+    const userId = req.user.id;
+
+    // Get user's cart
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: { include: { product: true } },
+      },
+    });
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    let subtotal = 0;
+
+    // Validate stock
+    for (let item of cart.items) {
+      if (item.quantity > item.product.stock) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.product.name}`,
+        });
+      }
+      subtotal += item.product.price * item.quantity;
+    }
+
+    // Create order transaction
+    const order = await prisma.$transaction(async (tx) => {
+      const newOrder = await tx.order.create({
+        data: {
+          userId,
+          subtotal,
+          total: subtotal, // for now, no tax/shipping
+        },
+      });
+
+      // Create order items and deduct stock
+      for (let item of cart.items) {
+        await tx.orderItem.create({
+          data: {
+            orderId: newOrder.id,
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.product.price,
+          },
+        });
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: item.product.stock - item.quantity },
+        });
+      }
+
+      // Clear cart
+      await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+      return newOrder;
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order created successfully",
+      data: order,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Failed to create order",
+      error: error.message,
+    });
+  }
+};
+
+// get user order
+export const getMyOrders = async (req: any, res: any) => {
+  try {
+    const userId = req.user.id;
+
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: { items: { include: { product: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Failed to fetch orders",
+      error: error.message,
+    });
+  }
+};

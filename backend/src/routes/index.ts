@@ -4,6 +4,7 @@ import authRoutes from "./auth.routes";
 import cartRoutes from "./cart.routes";
 import categoryRoutes from "./category.routes";
 import googleAuthRoutes from "./googleAuth.routes";
+import orderRoutes from "./order.routes";
 import productRoutes from "./product.routes";
 import refreshTokenRoutes from "./refresh.router";
 import superAdminRoutes from "./super.admin.routes";
@@ -22,5 +23,6 @@ router.use("/product", productRoutes);
 router.use("/category", categoryRoutes);
 router.use("/wishlist", wishlistRoutes);
 router.use("/cart", cartRoutes);
+router.use("/order", orderRoutes);
 
 export default router;
