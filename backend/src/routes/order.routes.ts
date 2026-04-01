@@ -1,10 +1,22 @@
 import { Router } from "express";
-import { createOrder, getMyOrders } from "../controller/order.controller";
+import {
+  createOrder,
+  getAllOrders,
+  getMyOrders,
+  updateOrderStatus,
+} from "../controller/order.controller";
 import { protect } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/authorize";
 
 const router = Router();
 
 router.post("/create", protect, createOrder);
 router.get("/my-orders", protect, getMyOrders);
-
+router.get("/all", protect, authorize("ADMIN", "SUPER_ADMIN"), getAllOrders);
+router.put(
+  "/update-status/:id",
+  protect,
+  authorize("ADMIN", "SUPER_ADMIN"),
+  updateOrderStatus,
+);
 export default router;

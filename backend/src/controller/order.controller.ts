@@ -97,3 +97,80 @@ export const getMyOrders = async (req: any, res: any) => {
     });
   }
 };
+
+// Admin super admin: Get all orders
+export const getAllOrders = async (req: any, res: any) => {
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        items: {
+          include: {
+            product: true, // include product info
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders",
+      error: error.message,
+    });
+  }
+};
+
+// Admin super admin: Update order status
+export const updateOrderStatus = async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "PENDING",
+      "PAID",
+      "SHIPPED",
+      "DELIVERED",
+      "CANCELLED",
+    ];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Allowed: ${allowedStatuses.join(", ")}`,
+      });
+    }
+
+    // Check if order exists
+    const order = await prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Update status
+    const updatedOrder = await prisma.order.update({
+      where: { id },
+      data: { status },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order status updated",
+      data: updatedOrder,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+      error: error.message,
+    });
+  }
+};
