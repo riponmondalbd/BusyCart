@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { getTopProducts } from "../controller/analytics.controller";
+import {
+  getRevenueAnalytics,
+  getTopProducts,
+} from "../controller/analytics.controller";
 import { protect } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/authorize";
 
@@ -10,6 +13,12 @@ router.get(
   protect,
   authorize("ADMIN", "SUPER_ADMIN"),
   getTopProducts,
+);
+router.get(
+  "/revenue",
+  protect,
+  authorize("ADMIN", "SUPER_ADMIN"),
+  getRevenueAnalytics,
 );
 
 export default router;
