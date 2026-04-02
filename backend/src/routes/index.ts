@@ -6,6 +6,7 @@ import cartRoutes from "./cart.routes";
 import categoryRoutes from "./category.routes";
 import couponRoutes from "./coupon.routes";
 import googleAuthRoutes from "./googleAuth.routes";
+import invoiceRoutes from "./invoice.routes";
 import orderRoutes from "./order.routes";
 import paymentRoutes from "./payment.routes";
 import productRoutes from "./product.routes";
@@ -32,5 +33,6 @@ router.use("/payment", paymentRoutes);
 router.use("/coupon", couponRoutes);
 router.use("/refund", refundRoutes);
 router.use("/analytics", analyticsRoutes);
+router.use("/invoice", invoiceRoutes);
 
 export default router;
