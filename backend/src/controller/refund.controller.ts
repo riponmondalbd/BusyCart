@@ -91,3 +91,55 @@ export const refundOrder = async (req: any, res: any) => {
     });
   }
 };
+
+// admin super admin: get all refunds
+export const getAllRefunds = async (req: any, res: any) => {
+  try {
+    const refunds = await prisma.refund.findMany({
+      include: {
+        order: true,
+        payment: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: refunds,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Failed to fetch refunds",
+      error: error.message,
+    });
+  }
+};
+
+// user: get my refunds
+export const getMyRefunds = async (req: any, res: any) => {
+  try {
+    const userId = req.user.id;
+
+    const refunds = await prisma.refund.findMany({
+      where: {
+        order: {
+          userId,
+        },
+      },
+      include: {
+        order: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: refunds,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Failed to fetch refunds",
+      error: error.message,
+    });
+  }
+};
