@@ -173,3 +173,13 @@ model Payment {
   reference String        @unique
   createdAt DateTime      @default(now())
 }
+
+model Coupon {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  discount  Float
+  type      String
+  minAmount Float?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

@@ -3,6 +3,7 @@ import adminRoutes from "./admin.routes";
 import authRoutes from "./auth.routes";
 import cartRoutes from "./cart.routes";
 import categoryRoutes from "./category.routes";
+import couponRoutes from "./coupon.routes";
 import googleAuthRoutes from "./googleAuth.routes";
 import orderRoutes from "./order.routes";
 import paymentRoutes from "./payment.routes";
@@ -26,5 +27,6 @@ router.use("/wishlist", wishlistRoutes);
 router.use("/cart", cartRoutes);
 router.use("/order", orderRoutes);
 router.use("/payment", paymentRoutes);
+router.use("/coupon", couponRoutes);
 
 export default router;
