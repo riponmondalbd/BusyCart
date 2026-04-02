@@ -21,6 +21,13 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  SUCCESS
+  FAILED
+}
+
 model User {
   id         String  @id @default(uuid())
   name       String?
@@ -40,6 +47,7 @@ model User {
   wishlists Wishlist[]
   cart      Cart?
   orders    Order[]
+  payments  Payment[]
 }
 
 model RefreshToken {
@@ -140,6 +148,7 @@ model Order {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   items     OrderItem[]
+  payments  Payment[]
 }
 
 model OrderItem {
@@ -150,4 +159,17 @@ model OrderItem {
   price     Float // price at the time of order
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Float
+  method    String
+  status    PaymentStatus @default(PENDING)
+  reference String        @unique
+  createdAt DateTime      @default(now())
 }
