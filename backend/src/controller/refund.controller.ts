@@ -31,7 +31,7 @@ export const refundOrder = async (req: any, res: any) => {
           userId: order.userId,
           amount: order.total,
           method: "MANUAL_FIX",
-          status: "PAID",
+          status: "SUCCEEDED",
           reference: `FIX-${Math.random()
             .toString(36)
             .substring(2, 10)

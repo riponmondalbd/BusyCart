@@ -32,7 +32,7 @@ export const simulatePayment = async (req: any, res: any) => {
         userId,
         amount: order.total,
         method,
-        status: "PAID",
+        status: "SUCCEEDED",
         reference,
       },
     });

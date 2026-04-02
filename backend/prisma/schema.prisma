@@ -23,11 +23,12 @@ enum OrderStatus {
 }
 
 enum PaymentStatus {
-  PENDING
-  PAID
-  SUCCESS
-  REFUNDED
+  CREATED
+  PROCESSING
+  SUCCEEDED
   FAILED
+  CANCELED
+  REFUNDED
 }
 
 enum RefundStatus {
@@ -181,7 +182,7 @@ model Payment {
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   amount    Float
   method    String
-  status    PaymentStatus @default(PENDING)
+  status    PaymentStatus @default(CREATED)
   reference String        @unique
   createdAt DateTime      @default(now())
   refunds   Refund[]

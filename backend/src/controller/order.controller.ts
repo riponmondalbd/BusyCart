@@ -217,7 +217,7 @@ export const updateOrderStatus = async (req: any, res: any) => {
               userId: order.userId,
               amount: order.total,
               method: "MANUAL",
-              status: "PAID",
+              status: "SUCCEEDED",
               reference: `MAN-${Math.random()
                 .toString(36)
                 .substring(2, 10)

@@ -91,9 +91,11 @@ export const updateCartItem = async (req: any, res: any) => {
     const { itemId } = req.params;
     const { quantity } = req.body;
 
-    if (!quantity || quantity < 1) {
+    const parsedQuantity = Number(quantity);
+
+    if (isNaN(parsedQuantity) || parsedQuantity < 1) {
       return res.status(400).json({
-        message: "Quantity must be at least 1",
+        message: "Quantity must be a valid number at least 1",
       });
     }
 
@@ -110,21 +112,30 @@ export const updateCartItem = async (req: any, res: any) => {
       include: { product: true },
     });
 
-    if (!item || item.cartId !== cart.id) {
-      return res.status(403).json({
-        message: "Unauthorized access to cart item",
+    if (!item) {
+      return res.status(404).json({
+        message: "Cart item not found. Please ensure you are using the 'itemId' from your cart response.",
       });
     }
 
-    if (quantity > item.product.stock) {
+    if (item.cartId !== cart.id) {
+      return res.status(403).json({
+        message: "Unauthorized access to this cart item",
+      });
+    }
+
+    if (parsedQuantity > item.product.stock) {
       return res.status(400).json({
-        message: `Only ${item.product.stock} items available`,
+        message: `Only ${item.product.stock} items available in stock`,
       });
     }
 
     const updated = await prisma.cartItem.update({
       where: { id: itemId },
-      data: { quantity },
+      data: { quantity: parsedQuantity },
+      include: {
+        product: true,
+      },
     });
 
     return res.status(200).json({
@@ -158,9 +169,15 @@ export const removeCartItem = async (req: any, res: any) => {
       where: { id: itemId },
     });
 
-    if (!item || item.cartId !== cart.id) {
+    if (!item) {
+      return res.status(404).json({
+        message: "Cart item not found",
+      });
+    }
+
+    if (item.cartId !== cart.id) {
       return res.status(403).json({
-        message: "Unauthorized access",
+        message: "Unauthorized access to this cart item",
       });
     }
 
@@ -170,7 +187,7 @@ export const removeCartItem = async (req: any, res: any) => {
 
     return res.status(200).json({
       success: true,
-      message: "Item removed",
+      message: "Item removed from cart",
     });
   } catch (error: any) {
     return res.status(500).json({
