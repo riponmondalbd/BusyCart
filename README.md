@@ -122,3 +122,7 @@ BusyCart is a comprehensive e-commerce platform backend, designed to handle ever
 ## 🤝 Contributing
 
 Contributions are always welcome! Feel free to open an issue or submit a pull request if you'd like to improve the BusyCart project.
+
+---
+
+Developed by [Ripon](https://riponmondalbd.vercel.app)
